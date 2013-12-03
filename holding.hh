@@ -1,7 +1,25 @@
+template <unsigned int acc_counter, unsigned int hs_counter, unsigned int exo_counter>
+struct Company {
+	const unsigned int acc_counter = acc_counter;
+	const unsigned int hs_counter = hs_counter;
+	const unsigned int exo_counter = exo_counter;
+}
+
+/*  ???? jak mamy to zapisac?
+struct Accountancy = Company<1,0,0>
+struct Hunting_shop = Company<0,1,0>
+struct Exchange_office = Company<0,0,1>
+*/
+
+
+
 /*
  * Struktura reprezentująca połącznie dwóch firm - C1 i C2.
  */
-template<class C1, class C2> struct add_comp;
+template<class C1, class C2> struct add_comp {
+ 	/*Struktura powinna zawierać publiczną definicję type, opisującą nową firmę. ???*/
+
+}
 
 /*
  * Struktura reprezentująca firmę C1 pomniejszoną o C2.
@@ -72,14 +90,18 @@ solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3);
 /*
  * Klasa reprezentująca grupę równoważnych firm.
  */
+template<struct S> //...?
 class Group<Company> {
 	private:
-
+		unsigned int company_counter;
+		unsigned int acc_val;
+		unsigned int hs_val;
+		unsigned int exo_val;
 	public:
 		/*
 		 * Definicja typu reprezentujacego strukture pojedynczej firmy.
 		 */
-		
+		typedef typename Company company_type; //??
 		
 		/*
 		 * Zmienna statyczna.
@@ -99,59 +121,98 @@ class Group<Company> {
 		/*
 		 * Konstruktor kopiujący.
 		 */
-		Group(Group<Company> const& g);
+		Group(Group<Company> const& g) { 
+			this.company_type = g.company_type;
+			this.company_counter = g.get_size();
+			this.company.acc_counter = g.company.acc_counter;
+			this.company.hs_counter = g.company.hscounter;
+			this.company.exo_counter = g.company.exo_counter;
+			set_acc_val(g.company.get_acc_val());
+			set_hs_val(g.company.get_hs_val());
+			set_exo_val(g.company.get_exo_val());
+			return this;
+		}
 
 		/*
 		 * Zwraca liczbę firm wchodzących w skład grupy.
 		 */
-		unsigned int get_size() const;
+		unsigned int get_size() const {
+			return company_counter;
+		}
 
 		/*
-		 * Ustawia nową liczbę biur podatkowych.
+		 * Ustawia nową wartosc biur podatkowych.
 		 */
-		void set_acc_val(unsigned int i);
+		void set_acc_val(unsigned int i) {
+			acc_val = i;
+		}
 
 		/*
-		 * Ustawia nową liczbę sklepów myśliwskich.
+		 * Ustawia nową wartosc sklepów myśliwskich.
 		 */
-		void set_hs_val(unsigned int i);
+		void set_hs_val(unsigned int i) {
+			hs_val = i;
+		}
 
 		/*
-		 * Ustawia nową liczbę kantorów.
+		 * Ustawia nową wartosc kantorów.
 		 */
-		void set_exo_val(unsigned int i);
+		void set_exo_val(unsigned int i) {
+			exo_val = i;
+		}
 
 		/*
 		 * Metoda zwracająca wartość biura rachunkowego.
 		 */		
-		unsigned int get_acc_val() const;
+		unsigned int get_acc_val() const {
+			return acc_val;
+		}
 		
 		/*
 		 * Metoda zwracająca wartość sklepu mysliwskiego.
 		 */		
-		unsigned int get_hs_val() const;
+		unsigned int get_hs_val() const {
+			return hs_val;
+		}
 		
 		/*
 		 * Metoda zwracająca wartość kantoru.
 		 */
-		unsigned int get_exo_val() const;
+		unsigned int get_exo_val() const {
+			return exo_val;
+		}
 
 		/*
 		 * Metoda zwracająca wartość grupy.
 		 */
-		unsigned int get_value() const;
+		unsigned int get_value() const {
+			return (acc_val * company.acc_counter) + (hs_val * company.hs_counter)
+				+ (exo_val * company.exo_counter); 
+		}
 		
 		/*
 		 * Metoda dodajaca do liczby firm w grupie liczbe firm z drugiej grupy.
 		 * Wartość pojedynczego przedsiębiorstwa w nowej grupie liczymy jako średnią 
 		 * ważoną wartości firm z sumowanych grup.
 		 */
-		Group& operator += (Group<Company> const& g);
+		Group& operator += (Group<Company> const& g) { /*bardzo mozliwe, ze do g trzeb sie dostac poprzez g.get..()*/
+			this->acc_val = (company.acc_counter * acc_val + g.company.acc_counter * g.get_acc_val())
+				/ (company.acc_counter + g.company.acc_counter);
+			this->hs_val = (company.hs_counter * acc_val + g.company.hs_counter * g.get_hs_val())
+				/ (company.hs_counter + g.company.hs_counter);
+			this->acc_val = (company.exo_counter * exo_val + g.company.exo_counter * g.get_exo_val())
+				/ (company.exo_counter + g.company.exo_counter);
+			this->company_counter += g.get_size();
+			return *this;
+		}
 		
 		/*
 		 * Metoda zwracajaca nowa grupe o liczbie firm rownej sumie liczb firm z dwoch grup.
 		 */
-		Group operator + (Group<Company> const& g);
+		Group operator + (Group<Company> const& g) {
+			//nie daloby sie jakos tak? z uzyciem kontrukotra kopiujacego i gornej metody?
+			return Group(this += g);
+		}
 		
 		/*
 		 * Metoda zodejmujaca od liczby firm z grupy liczbe firm z drugiej grupy.
@@ -159,11 +220,20 @@ class Group<Company> {
 		 * ważoną wartości firm z sumowanych grup.
 		 */
 		Group& operator -= (Group<Company> const& g);
-		
+			this->acc_val = (company.acc_counter * acc_val - g.company.acc_counter * g.get_acc_val())
+				/ (company.acc_counter - g.company.acc_counter);
+			this->hs_val = (company.hs_counter * acc_val - g.company.hs_counter * g.get_hs_val())
+				/ (company.hs_counter - g.company.hs_counter);
+			this->acc_val = (company.exo_counter * exo_val - g.company.exo_counter * g.get_exo_val())
+				/ (company.exo_counter - g.company.exo_counter);
+			this->company_counter += g.get_size();
+			return *this;
 		/*
 		 * Metoda zwracajaca nowa grupe o liczbie firm rownej roznicy liczb firm z dwoch grup.
 		 */
-		Group operator - (Group<Company> const& g);
+		Group operator - (Group<Company> const& g) {
+			//podobne poytanie jak w dodawaniu
+		}
 		
 		/*
 		 * Metoda zwiekszajaca liczbe firm w grupie i razy.
@@ -209,7 +279,7 @@ class Group<Company> {
 		bool operator > (Group const& g);	
 		
 		/*
-		 * Metoda sprawdzajaca mniejszosc
+		 * Metoda sprawdzajaca mniejszosc 
 		 */
 		bool operator == (Group const& g);		
 		
@@ -226,5 +296,10 @@ class Group<Company> {
 		/*
 		 * Metoda wypisujaca na strumien opis grupy
 		 */
-		ostream& operator << (ostream& os, Group const& g);
+		ostream& operator << (ostream& os, Group const& g) {
+			os << "Number of companies: " << g.get_size() << "; Value: " << g.get_value() <<
+				"\nAccountancies value: " << g.get_acc_val() << ", Hunting shops value: " << g.get_hs_val() <<
+				", Exchange offices value: " << g.get_exo_val() << endl;
+			return os;
+		}
 }
