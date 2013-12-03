@@ -1,50 +1,107 @@
-template <unsigned int acc_counter, unsigned int hs_counter, unsigned int exo_counter>
-struct Company {
-	const unsigned int acc_counter = acc_counter;
-	const unsigned int hs_counter = hs_counter;
-	const unsigned int exo_counter = exo_counter;
-}
-
-/*  ???? jak mamy to zapisac?
-struct Accountancy = Company<1,0,0>
-struct Hunting_shop = Company<0,1,0>
-struct Exchange_office = Company<0,0,1>
-*/
-
-
+#ifndef HOLDINGHH
+#define HILDINGHH
 
 /*
- * Struktura reprezentująca połącznie dwóch firm - C1 i C2.
+ * Pomocnicze funkcje constexpr z podstawowymi operacjami arytmetycznymi.
+ */
+constexpr unsigned int minus(unsigned int a, unsigned int b)
+{
+	return (a > b) ? (a-b) : 0;
+}
+
+constexpr unsigned int divide(unsigned int a, unsigned int b)
+{
+	return (b != 0) ? a/b : 0;
+}
+
+/*
+ * Typ Company.
+ */
+template <unsigned int _acc, unsigned int _hs, unsigned int _exo>
+class Company {
+	public:
+		static const unsigned int acc = _acc;
+		static const unsigned int hs = _hs;
+		static const unsigned int exo = _exo;
+};
+
+/*
+ * Firmy skladajace się tylko z jednego przedsiabiorstwa.
+ */
+typedef Company<1, 0, 0> Accountancy;
+typedef Company<0, 1, 0> Hunting_shop;
+typedef Company<0, 0, 1> Exchange_office;
+
+/*
+ * Struktura reprezentujaca polacznie dwoch firm - C1 i C2.
  */
 template<class C1, class C2> struct add_comp {
- 	/*Struktura powinna zawierać publiczną definicję type, opisującą nową firmę. ???*/
-
-}
+	typedef Company<
+		C1::acc + C2::acc,
+	       	C1::hs + C2::hs,
+		C1::exo + C2::exo
+	> type;
+};
 
 /*
  * Struktura reprezentująca firmę C1 pomniejszoną o C2.
  */
-template<class C1, class C2> struct remove_comp;
+template<class C1, class C2> struct remove_comp {
+	typedef Company
+	<
+		minus(C1::acc, C2::acc),
+		minus(C1::hs, C2::hs),
+		minus(C1::exo, C2::exo)
+	> type;
+};
 
 /*
  * Struktura reprezentująca firmę C1 powiększoną n-krotnie.
  */
-template<class C1, int n> struct multiply_comp;
+template<class C1, int n> struct multiply_comp {
+	typedef Company
+	<
+		C1::acc * n,
+		C1::hs * n,
+		C1::exo * n
+	> type;
+};
 
 /*
  * Struktura rozbijająca firmę C1 na n mniejszych (całkowitoliczbowo, reszta przepada).
  */
-template<class C1, int n> struct split_comp;
+template<class C1, int n> struct split_comp {
+	typedef Company
+	<
+		divide(C1::acc, n),
+		divide(C1::hs, n),
+		divide(C1::exo, n)
+	> type;
+};
 
 /*
  * Struktura reprezentująca firmę C z powiększoną o jeden liczbą wszystkich przedsiębiorstw wchodzących w skład firmy.
  */
-template<class C> struct additive_expand_comp;
+template<class C> struct additive_expand_comp {
+	typedef Company
+	<
+		C::acc + 1,
+		C::hs + 1,
+		C::exo + 1
+	> type;
+};
 
 /*
  * Struktura reprezentująca firmę C z pomniejszoną o jeden liczbą wszystkich przedsiębiorstw wchodzączych w skład firmy.
  */
-template<class C> struct additive_rollup_comp;
+template<class C> struct additive_rollup_comp {
+	typedef Company
+	<
+		minus(C::acc, 1),
+		minus(C::hs, 1),
+		minus(C::exo, 1)
+	> type;
+};
 
 /*
  * Zwiększa o jeden liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej do grupy s1,
@@ -302,4 +359,6 @@ class Group<Company> {
 				", Exchange offices value: " << g.get_exo_val() << endl;
 			return os;
 		}
-}
+};
+
+#endif
