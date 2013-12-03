@@ -104,51 +104,9 @@ template<class C> struct additive_rollup_comp {
 };
 
 /*
- * Zwiększa o jeden liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej do grupy s1,
- * nie zmieniając wartości pojedynczego przedsiębiorstwa 
- */
-template<class C>
-Group<typename additive_expand_comp<C>::type> const
-additive_expand_group(Group<C> const &s1);
-
-/*
- * Zwiększa dziesięciokrotnie liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej 
- * do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
- */
-template<class C>
-Group<typename multiply_comp<C, 10>::type> const
-multiplicative_expand_group(Group<C> const &s1);
-
-/*
- * Zmniejsza o jeden liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej 
- * do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
- */
-template<class C>
-Group<typename additive_rollup_comp<C>::type> const
-additive_rollup_group(Group<C> const &s1);
-
-/*
- * Zmniejsza dziesięciokrotnie liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy 
- * należącej do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
- */
-template<class C>
-Group<typename split_comp<C, 10>::type> const
-multiplicative_rollup_group(Group<C> const &s1);
-
-/*
- * Funkcja, która pomoże nam określać, czy możliwe jest wyłonienie zwycięzcy przetargu 
- * w przypadku, gdy startują w nim grupy g1, g2 oraz g3. Zwycięzcą zostaje grupa,
- * która jest największa w sensie porządku zdefiniowanego na grupach.
- */
-template<class C1, class C2, class C3>
-bool
-solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3);
-
-/*
  * Klasa reprezentująca grupę równoważnych firm.
  */
-template<struct S> //...?
-class Group<Company> {
+template<class C> class Group {
 	private:
 		unsigned int company_counter;
 		unsigned int acc_val;
@@ -360,5 +318,46 @@ class Group<Company> {
 			return os;
 		}
 };
+
+/*
+ * Zwiększa o jeden liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej do grupy s1,
+ * nie zmieniając wartości pojedynczego przedsiębiorstwa 
+ */
+template<class C>
+Group<typename additive_expand_comp<C>::type> const
+additive_expand_group(Group<C> const &s1);
+
+/*
+ * Zwiększa dziesięciokrotnie liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej 
+ * do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
+ */
+template<class C>
+Group<typename multiply_comp<C, 10>::type> const
+multiplicative_expand_group(Group<C> const &s1);
+
+/*
+ * Zmniejsza o jeden liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej 
+ * do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
+ */
+template<class C>
+Group<typename additive_rollup_comp<C>::type> const
+additive_rollup_group(Group<C> const &s1);
+
+/*
+ * Zmniejsza dziesięciokrotnie liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy 
+ * należącej do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
+ */
+template<class C>
+Group<typename split_comp<C, 10>::type> const
+multiplicative_rollup_group(Group<C> const &s1);
+
+/*
+ * Funkcja, która pomoże nam określać, czy możliwe jest wyłonienie zwycięzcy przetargu 
+ * w przypadku, gdy startują w nim grupy g1, g2 oraz g3. Zwycięzcą zostaje grupa,
+ * która jest największa w sensie porządku zdefiniowanego na grupach.
+ */
+template<class C1, class C2, class C3>
+bool
+solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3);
 
 #endif
