@@ -147,9 +147,9 @@ template<class C> class Group {
 		/*
 		 * Konstruktor domyslny tworzacy grupe skladajaca sie z n firm.
 		 */
-		Group(unsigned int n = 1)
+		Group(unsigned int k = 1)
 		{
-			company_number = n;
+			company_number = k;
 			acc_val = ACC_DEFAULT;
 			hs_val = HS_DEFAULT;
 			exo_val = EXO_DEFAULT;
@@ -225,7 +225,7 @@ template<class C> class Group {
 		/*
 		 * Metoda zwracajaca wartosc grupy.
 		 */
-		unsigned int const& get_value() const
+		unsigned int const get_value() const
 		{
 			return ((acc_val * C::acc) + (hs_val * C::hs) + (exo_val * C::exo)) 
 				* company_number; 
@@ -302,7 +302,8 @@ template<class C> class Group {
 			company_number *= i;
 			acc_val = divide(acc_val, i);
 			hs_val = divide(hs_val, i);
-			exo_val = divide(exo_val, i);	
+			exo_val = divide(exo_val, i);
+			return *this;
 		}
 
 		/*
@@ -327,6 +328,7 @@ template<class C> class Group {
 			acc_val *= i;
 			hs_val *= i;
 			exo_val *= i;
+			return *this;
 		}
 
 		/*
@@ -343,7 +345,7 @@ template<class C> class Group {
 		/*
 		 * Metoda sprawdzajaca rownosc.
 		 */
-		template<class D> bool operator==(Group<D> const& g)
+		template<class D> bool operator==(Group<D> const& g) const
 		{
 			return (C::hs * company_number == D::hs * g.get_size()) &&
 				(C::exo * company_number == D::exo * g.get_size());
@@ -352,7 +354,7 @@ template<class C> class Group {
 		/*
 		 * Metoda sprawdzajaca nierownosc.
 		 */
-		template<class D> bool operator != (Group<D> const& g)
+		template<class D> bool operator != (Group<D> const& g) const
 		{
 			return !(*this == g);
 		}
@@ -360,7 +362,7 @@ template<class C> class Group {
 		/*
 		 * Metoda sprawdzajaca wiekszosc.
 		 */
-		template<class D> bool operator>(Group<D> const& g)
+		template<class D> bool operator>(Group<D> const& g) const
 		{
 			return (C::hs * company_number + C::exo * company_number) >
 				(D::hs * g.get_size() + D::exo * g.get_size());
@@ -369,16 +371,16 @@ template<class C> class Group {
 		/*
 		 * Metoda sprawdzajaca mniejszosc. 
 		 */
-		template<class D> bool operator<(Group<D> const& g)
+		template<class D> bool operator<(Group<D> const& g) const
 		{
 			return (C::hs * company_number + C::exo * company_number) <
 				(D::hs * g.get_size() + D::exo * g.get_size());
 		}	
 
 		/*
-		 * Metoda sprawdzajaca bycie nie wieszym.
+		 * Metoda sprawdzajaca bycie nie wiekszym.
 		 */
-		template<class D> bool operator<=(Group<D> const& g)
+		template<class D> bool operator<=(Group<D> const& g) const
 		{
 			return (*this == g) || (*this < g);
 		}
@@ -386,7 +388,7 @@ template<class C> class Group {
 		/*
 		 * Metoda sprawdzajaca bycie nie mniejszym.
 		 */
-		template<class D> bool operator>=(Group<D> const& g)
+		template<class D> bool operator>=(Group<D> const& g) const
 		{
 			return (*this == g) || (*this > g);
 		}
@@ -454,9 +456,10 @@ multiplicative_rollup_group(Group<C> const &s1)
  * ktora jest najwieksza w sensie porzadku zdefiniowanego na grupach.
  */
 template<class C1, class C2, class C3>
-bool solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3)
+bool
+solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3)
 {
-	//return (g1 > g2 && g1 > g3) || (g2 > g1 && g2 > g3) || (g3 > g1 && g3 > g2);
+	return (g1 > g2 && g1 > g3) || (g2 > g1 && g2 > g3) || (g3 > g1 && g3 > g2);
 }
 
 #endif
