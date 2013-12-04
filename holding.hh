@@ -2,16 +2,33 @@
 #define HILDINGHH
 
 /*
+ * Domyslne wartosci przedsiebiorstw.
+ */
+#define ACC_DEFAULT 50
+#define HS_DEFAULT 150
+#define EXO_DEFAULT 15
+
+/*
  * Pomocnicze funkcje constexpr z podstawowymi operacjami arytmetycznymi.
  */
-constexpr unsigned int minus(unsigned int a, unsigned int b)
+constexpr unsigned int c_minus(unsigned int a, unsigned int b) //nie mam pewnosci co do koniecznosci uzywania tych constexpr, w innym wypadku mamy problemy z kompilacją
 {
 	return (a > b) ? (a-b) : 0;
 }
 
-constexpr unsigned int divide(unsigned int a, unsigned int b)
+constexpr unsigned int c_divide(unsigned int a, unsigned int b)
 {
 	return (b != 0) ? a/b : 0;
+}
+
+unsigned int divide(unsigned int a, unsigned int b)
+{
+	return (b != 0) ? a/b : 0;
+}
+
+unsigned int minus(unsigned int a, unsigned int b)
+{
+	return (a > b) ? (a-b) : 0;
 }
 
 /*
@@ -26,7 +43,7 @@ class Company {
 };
 
 /*
- * Firmy skladajace się tylko z jednego przedsiabiorstwa.
+ * Firmy skladajace sie tylko z jednego przedsiabiorstwa.
  */
 typedef Company<1, 0, 0> Accountancy;
 typedef Company<0, 1, 0> Hunting_shop;
@@ -38,276 +55,307 @@ typedef Company<0, 0, 1> Exchange_office;
 template<class C1, class C2> struct add_comp {
 	typedef Company<
 		C1::acc + C2::acc,
-	       	C1::hs + C2::hs,
+		C1::hs + C2::hs,
 		C1::exo + C2::exo
-	> type;
+			> type;
 };
 
 /*
- * Struktura reprezentująca firmę C1 pomniejszoną o C2.
+ * Struktura reprezentujaca firme C1 pomniejszona o C2.
  */
 template<class C1, class C2> struct remove_comp {
 	typedef Company
-	<
-		minus(C1::acc, C2::acc),
-		minus(C1::hs, C2::hs),
-		minus(C1::exo, C2::exo)
-	> type;
+		<
+		c_minus(C1::acc, C2::acc),
+		c_minus(C1::hs, C2::hs),
+		c_minus(C1::exo, C2::exo)
+			> type;
 };
 
 /*
- * Struktura reprezentująca firmę C1 powiększoną n-krotnie.
+ * Struktura reprezentujaca firme C1 powiekszona n-krotnie.
  */
 template<class C1, int n> struct multiply_comp {
 	typedef Company
-	<
+		<
 		C1::acc * n,
 		C1::hs * n,
 		C1::exo * n
-	> type;
+			> type;
 };
 
 /*
- * Struktura rozbijająca firmę C1 na n mniejszych (całkowitoliczbowo, reszta przepada).
+ * Struktura rozbijajaca firme C1 na n mniejszych (calkowitoliczbowo, reszta przepada).
  */
 template<class C1, int n> struct split_comp {
 	typedef Company
-	<
-		divide(C1::acc, n),
-		divide(C1::hs, n),
-		divide(C1::exo, n)
-	> type;
+		<
+		c_divide(C1::acc, n),
+		c_divide(C1::hs, n),
+		c_divide(C1::exo, n)
+			> type;
 };
 
 /*
- * Struktura reprezentująca firmę C z powiększoną o jeden liczbą wszystkich przedsiębiorstw wchodzących w skład firmy.
+ * Struktura reprezentujaca firme C z powiekszona o jeden liczba wszystkich przedsiebiorstw wchodzacych w sklad firmy.
  */
 template<class C> struct additive_expand_comp {
 	typedef Company
-	<
+		<
 		C::acc + 1,
 		C::hs + 1,
 		C::exo + 1
-	> type;
+			> type;
 };
 
 /*
- * Struktura reprezentująca firmę C z pomniejszoną o jeden liczbą wszystkich przedsiębiorstw wchodzączych w skład firmy.
+ * Struktura reprezentujaca firme C z pomniejszona o jeden liczba wszystkich przedsiebiorstw wchodzaczych w sklad firmy.
  */
 template<class C> struct additive_rollup_comp {
 	typedef Company
-	<
-		minus(C::acc, 1),
-		minus(C::hs, 1),
-		minus(C::exo, 1)
-	> type;
+		<
+		c_minus(C::acc, 1),
+		c_minus(C::hs, 1),
+		c_minus(C::exo, 1)
+			> type;
 };
 
 /*
- * Klasa reprezentująca grupę równoważnych firm.
+ * Klasa reprezentujaca grupe rownowaznych firm.
  */
 template<class C> class Group {
 	private:
-		unsigned int company_counter;
+
+		unsigned int company_number;
 		unsigned int acc_val;
 		unsigned int hs_val;
 		unsigned int exo_val;
-	public:
+	public:		
+
 		/*
 		 * Definicja typu reprezentujacego strukture pojedynczej firmy.
 		 */
-		typedef typename Company company_type; //??
-		
+		typedef C company_type;
+
 		/*
 		 * Zmienna statyczna.
 		 */
-		company_type company;
-		
-		/*
-		 * Konstruktor domyślny tworzący grupę skłądającą się tylko z jednej firmy.
-		 */
-		Group();
+		static company_type company;
 
 		/*
-		 * Konstruktor tworzący grupę składającą się z k-firm o identycznej strukturze.
+		 * Konstruktor domyslny tworzacy grupe skladajaca sie z n firm.
 		 */
-		Group(unsigned int k);
-
-		/*
-		 * Konstruktor kopiujący.
-		 */
-		Group(Group<Company> const& g) { 
-			this.company_type = g.company_type;
-			this.company_counter = g.get_size();
-			this.company.acc_counter = g.company.acc_counter;
-			this.company.hs_counter = g.company.hscounter;
-			this.company.exo_counter = g.company.exo_counter;
-			set_acc_val(g.company.get_acc_val());
-			set_hs_val(g.company.get_hs_val());
-			set_exo_val(g.company.get_exo_val());
-			return this;
+		Group(unsigned int n = 1)
+		{
+			company_number = n;
+			acc_val = ACC_DEFAULT;
+			hs_val = HS_DEFAULT;
+			exo_val = EXO_DEFAULT;
 		}
 
 		/*
-		 * Zwraca liczbę firm wchodzących w skład grupy.
+		 * Konstruktor kopiujacy.
 		 */
-		unsigned int get_size() const {
-			return company_counter;
-		}
+		Group(Group<C> const& g)
+		{ 
+			company_number = g.get_size();
+			acc_val = g.get_acc_val;
+			hs_val = g.get_hs_val;
+			exo_val = g.exo_val;
+		}	
 
 		/*
-		 * Ustawia nową wartosc biur podatkowych.
+		 * Ustawia nowa wartosc biur podatkowych.
 		 */
-		void set_acc_val(unsigned int i) {
+		void set_acc_val(unsigned int i)
+		{
 			acc_val = i;
 		}
 
 		/*
-		 * Ustawia nową wartosc sklepów myśliwskich.
+		 * Ustawia nowa wartosc sklepow mysliwskich.
 		 */
-		void set_hs_val(unsigned int i) {
+		void set_hs_val(unsigned int i)
+		{
 			hs_val = i;
 		}
 
 		/*
-		 * Ustawia nową wartosc kantorów.
+		 * Ustawia nowa wartosc kantorow.
 		 */
-		void set_exo_val(unsigned int i) {
+		void set_exo_val(unsigned int i)
+		{
 			exo_val = i;
 		}
 
 		/*
-		 * Metoda zwracająca wartość biura rachunkowego.
+		 * Metoda zwracajaca wartosc biura rachunkowego.
 		 */		
-		unsigned int get_acc_val() const {
+		unsigned int get_acc_val() const 
+		{
 			return acc_val;
 		}
-		
+
 		/*
-		 * Metoda zwracająca wartość sklepu mysliwskiego.
+		 * Metoda zwracajaca wartosc sklepu mysliwskiego.
 		 */		
-		unsigned int get_hs_val() const {
+		unsigned int get_hs_val() const 
+		{
 			return hs_val;
 		}
-		
+
 		/*
-		 * Metoda zwracająca wartość kantoru.
+		 * Metoda zwracajaca wartosc kantoru.
 		 */
-		unsigned int get_exo_val() const {
+		unsigned int get_exo_val() const
+		{
 			return exo_val;
 		}
 
 		/*
-		 * Metoda zwracająca wartość grupy.
+		 * Metoda zwracajaca wartosc grupy.
 		 */
-		unsigned int get_value() const {
-			return (acc_val * company.acc_counter) + (hs_val * company.hs_counter)
-				+ (exo_val * company.exo_counter); 
+		unsigned int const& get_value() const
+		{
+			return ((acc_val * C::acc) + (hs_val * C::hs) + (exo_val * C::exo)) 
+				* company_number; 
 		}
-		
+
 		/*
 		 * Metoda dodajaca do liczby firm w grupie liczbe firm z drugiej grupy.
-		 * Wartość pojedynczego przedsiębiorstwa w nowej grupie liczymy jako średnią 
-		 * ważoną wartości firm z sumowanych grup.
+		 * Wartosc pojedynczego przedsiebiorstwa w nowej grupie liczymy jako srednia 
+		 * wazona wartosci firm z sumowanych grup.
 		 */
-		Group& operator += (Group<Company> const& g) { /*bardzo mozliwe, ze do g trzeb sie dostac poprzez g.get..()*/
-			this->acc_val = (company.acc_counter * acc_val + g.company.acc_counter * g.get_acc_val())
-				/ (company.acc_counter + g.company.acc_counter);
-			this->hs_val = (company.hs_counter * acc_val + g.company.hs_counter * g.get_hs_val())
-				/ (company.hs_counter + g.company.hs_counter);
-			this->acc_val = (company.exo_counter * exo_val + g.company.exo_counter * g.get_exo_val())
-				/ (company.exo_counter + g.company.exo_counter);
-			this->company_counter += g.get_size();
+		Group& operator+=(Group<C> const& g) //z tymi operatorami mam troche watpliwosci, do weryfikacji
+		{
+			acc_val = divide((C::acc * acc_val + g.company.acc * g.get_acc_val())
+					, (C::acc + g.company.acc));
+			hs_val = divide((C::hs * acc_val + g.company.hs * g.get_hs_val())
+					, (C::hs + g.company.hs));
+			exo_val = divide((C::exo * exo_val + g.company.exo * g.get_exo_val())
+					, (C::exo + g.company.exo));
+			company_number += g.get_size();
 			return *this;
 		}
-		
+
 		/*
 		 * Metoda zwracajaca nowa grupe o liczbie firm rownej sumie liczb firm z dwoch grup.
 		 */
-		Group operator + (Group<Company> const& g) {
-			//nie daloby sie jakos tak? z uzyciem kontrukotra kopiujacego i gornej metody?
-			return Group(this += g);
+		Group operator+(Group<C> const& g)//ten trick jest moim zdaniem ok
+		{			
+			return *this += g;
 		}
-		
+
 		/*
 		 * Metoda zodejmujaca od liczby firm z grupy liczbe firm z drugiej grupy.
-		 * Wartość pojedynczego przedsiębiorstwa w nowej grupie liczymy jako średnią 
-		 * ważoną wartości firm z sumowanych grup.
+		 * Wartosc pojedynczego przedsiebiorstwa w nowej grupie liczymy jako srednia 
+		 * wazona wartosci firm z sumowanych grup.
 		 */
-		Group& operator -= (Group<Company> const& g);
-			this->acc_val = (company.acc_counter * acc_val - g.company.acc_counter * g.get_acc_val())
-				/ (company.acc_counter - g.company.acc_counter);
-			this->hs_val = (company.hs_counter * acc_val - g.company.hs_counter * g.get_hs_val())
-				/ (company.hs_counter - g.company.hs_counter);
-			this->acc_val = (company.exo_counter * exo_val - g.company.exo_counter * g.get_exo_val())
-				/ (company.exo_counter - g.company.exo_counter);
-			this->company_counter += g.get_size();
+		Group& operator-=(Group<C> const& g)
+		{
+			acc_val = divide(
+					minus(C::acc * acc_val, g.company.acc * g.get_acc_val())
+					, (C::acc - g.company.acc)
+					);
+			hs_val = divide(
+					minus(C::hs * acc_val - g.company.hs * g.get_hs_val())
+					, (C::hs - g.company.hs)
+				       );
+			exo_val = divide(
+					minus(C::exo * exo_val, g.company.exo * g.get_exo_val())
+					, (C::exo - g.company.exo)
+					);
+
+			company_number = minus(company_number, g.get_size());
+			company_number = 0;
+
 			return *this;
+		}
+
 		/*
 		 * Metoda zwracajaca nowa grupe o liczbie firm rownej roznicy liczb firm z dwoch grup.
 		 */
-		Group operator - (Group<Company> const& g) {
-			//podobne poytanie jak w dodawaniu
+		Group operator-(Group<C> const& g)
+		{
+			return *this -= g;
 		}
-		
+
 		/*
 		 * Metoda zwiekszajaca liczbe firm w grupie i razy.
-		 * Przy mnożeniu grupy przez n wartość pojedynczego przedsiębiorstwa
+		 * Przy mnozeniu grupy przez n wartosc pojedynczego przedsiebiorstwa
 		 * ulega zmniejszeniu n razy.
 		 */
-		Group& operator *= (unsigned int i);
-		
+		Group& operator*=(unsigned int i)
+		{
+			company_number *= i;
+			acc_val = divide(acc_val, i);
+			hs_val = divide(hs_val, i);
+			exo_val = divide(exo_val, i);	
+		}
+
 		/*
 		 * Metoda zwracajaca grupe o liczbie firm i razy wiekszej.
-		 * Przy mnożeniu grupy przez n wartość pojedynczego przedsiębiorstwa
+		 * Przy mnozeniu grupy przez n wartosc pojedynczego przedsiebiorstwa
 		 * ulega zmniejszeniu n razy.
 		 */
-		Group operator * (unsigned int i);		
-		
+		Group operator*(unsigned int i)
+		{
+			return *this *= g;
+		}		
+
 		/*
 		 * Metoda zmniejszajaca liczbe firm w grupie i razy.
-		 * Pzy dzieleniu grupy przez n wartość pojedynczego przedsiębiorstwa
-		 * zwiększa się n razy. 
+		 * Pzy dzieleniu grupy przez n wartosc pojedynczego przedsiebiorstwa
+		 * zwieksza sie n razy. 
 		 */
-		Group& operator /= (unsigned int i);
-		
+		Group& operator /= (unsigned int i)
+		{
+			company_number = divide(company_number, i);
+			acc_val *= i;
+			hs_val *= i;
+			exo_val *= i;
+		}
+
 		/*
 		 * Metoda zwracajaca grupe o liczbie firm i razy mniejszej.
-		 * Pzy dzieleniu grupy przez n wartość pojedynczego przedsiębiorstwa
-		 * zwiększa się n razy. 
+		 * Pzy dzieleniu grupy przez n wartosc pojedynczego przedsiebiorstwa
+		 * zwieksza sie n razy. 
 		 */
-		Group operator / (unsigned int i);		
-		
+		Group operator / (unsigned int i)
+		{
+			return *this /= i;
+		}
+
 		/*
 		 * Metoda sprawdzajaca rownosc
 		 */
-		bool operator == (Group const& g);
-		
+		bool operator == (Group<C> const& g);
+
 		/*
 		 * Metoda sprawdzajaca nierownosc
 		 */
-		bool operator != (Group const& g);	
-		
+		bool operator != (Group<C> const& g);	
+
 		/*
 		 * Metoda sprawdzajaca wiekszosc
 		 */
-		bool operator > (Group const& g);	
-		
+		bool operator > (Group<C> const& g);	
+
 		/*
 		 * Metoda sprawdzajaca mniejszosc 
 		 */
-		bool operator == (Group const& g);		
-		
+		bool operator == (Group<C> const& g);		
+
 		/*
 		 * Metoda sprawdzajaca bycie nie wieszym
 		 */
-		bool operator <= (Group const& g);
+		bool operator <= (Group<C> const& g);
 
 		/*
 		 * Metoda sprawdzajaca bycie nie mniejszym
 		 */
-		bool operator >= (Group const& g);	
-		
+		bool operator >= (Group<C> const& g);	
+
 		/*
 		 * Metoda wypisujaca na strumien opis grupy
 		 */
@@ -320,41 +368,41 @@ template<class C> class Group {
 };
 
 /*
- * Zwiększa o jeden liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej do grupy s1,
- * nie zmieniając wartości pojedynczego przedsiębiorstwa 
+ * Zwieksza o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej do grupy s1,
+ * nie zmieniajac wartosci pojedynczego przedsiebiorstwa 
  */
 template<class C>
 Group<typename additive_expand_comp<C>::type> const
 additive_expand_group(Group<C> const &s1);
 
 /*
- * Zwiększa dziesięciokrotnie liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej 
- * do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
+ * Zwieksza dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
+ * do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
 Group<typename multiply_comp<C, 10>::type> const
 multiplicative_expand_group(Group<C> const &s1);
 
 /*
- * Zmniejsza o jeden liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy należącej 
- * do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
+ * Zmniejsza o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
+ * do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
 Group<typename additive_rollup_comp<C>::type> const
 additive_rollup_group(Group<C> const &s1);
 
 /*
- * Zmniejsza dziesięciokrotnie liczbę przedsiębiorstw (wszystkich typów) wchodzących w skład każdej firmy 
- * należącej do grupy s1, nie zmieniając wartości pojedynczego przedsiębiorstwa.
+ * Zmniejsza dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy 
+ * nalezacej do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
 Group<typename split_comp<C, 10>::type> const
 multiplicative_rollup_group(Group<C> const &s1);
 
 /*
- * Funkcja, która pomoże nam określać, czy możliwe jest wyłonienie zwycięzcy przetargu 
- * w przypadku, gdy startują w nim grupy g1, g2 oraz g3. Zwycięzcą zostaje grupa,
- * która jest największa w sensie porządku zdefiniowanego na grupach.
+ * Funkcja, ktora pomoze nam okreslac, czy mozliwe jest wylonienie zwyciezcy przetargu 
+ * w przypadku, gdy startuja w nim grupy g1, g2 oraz g3. Zwyciezca zostaje grupa,
+ * ktora jest najwieksza w sensie porzadku zdefiniowanego na grupach.
  */
 template<class C1, class C2, class C3>
 bool
