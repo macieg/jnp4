@@ -410,7 +410,10 @@ template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g)
  */
 template<class C>
 Group<typename additive_expand_comp<C>::type> const
-additive_expand_group(Group<C> const &s1);
+additive_expand_group(Group<C> const &s1)
+{
+	return Group<typename additive_expand_comp<C>::type>(s1); 
+}	
 
 /*
  * Zwieksza dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
@@ -418,7 +421,10 @@ additive_expand_group(Group<C> const &s1);
  */
 template<class C>
 Group<typename multiply_comp<C, 10>::type> const
-multiplicative_expand_group(Group<C> const &s1);
+multiplicative_expand_group(Group<C> const &s1)
+{
+	return Group<typename multiply_comp<C, 10>::type>(s1);
+}	
 
 /*
  * Zmniejsza o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
@@ -426,7 +432,10 @@ multiplicative_expand_group(Group<C> const &s1);
  */
 template<class C>
 Group<typename additive_rollup_comp<C>::type> const
-additive_rollup_group(Group<C> const &s1);
+additive_rollup_group(Group<C> const &s1) 
+{
+	return Group<typename additive_rollup_comp<C>::type>(s1);
+}	
 
 /*
  * Zmniejsza dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy 
@@ -434,7 +443,10 @@ additive_rollup_group(Group<C> const &s1);
  */
 template<class C>
 Group<typename split_comp<C, 10>::type> const
-multiplicative_rollup_group(Group<C> const &s1);
+multiplicative_rollup_group(Group<C> const &s1) 
+{
+	return Group<typename split_comp<C, 10>::type>(s1);
+}	
 
 /*
  * Funkcja, ktora pomoze nam okreslac, czy mozliwe jest wylonienie zwyciezcy przetargu 
@@ -442,12 +454,9 @@ multiplicative_rollup_group(Group<C> const &s1);
  * ktora jest najwieksza w sensie porzadku zdefiniowanego na grupach.
  */
 template<class C1, class C2, class C3>
-	bool
-solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3)
+bool solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3)
 {
-	return (g1 > g2 && g1 > g3) ||
-		(g2 > g1 && g2 > g3) ||
-		(g3 > g1 && g3 > g2);
+	//return (g1 > g2 && g1 > g3) || (g2 > g1 && g2 > g3) || (g3 > g1 && g3 > g2);
 }
 
 #endif
