@@ -411,10 +411,14 @@ template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g)
  * nie zmieniajac wartosci pojedynczego przedsiebiorstwa 
  */
 template<class C>
-Group<typename additive_expand_comp<C>::type> const
+	Group<typename additive_expand_comp<C>::type> const
 additive_expand_group(Group<C> const &s1)
 {
-	return Group<typename additive_expand_comp<C>::type>(s1); 
+	Group<typename additive_expand_comp<C>::type> tmp(s1.get_size());
+	tmp.set_acc_val(s1.get_acc_val());
+	tmp.set_hs_val(s1.get_hs_val());
+	tmp.set_exo_val(s1.get_exo_val());
+	return tmp; 
 }	
 
 /*
@@ -422,10 +426,14 @@ additive_expand_group(Group<C> const &s1)
  * do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
-Group<typename multiply_comp<C, 10>::type> const
+	Group<typename multiply_comp<C, 10>::type> const
 multiplicative_expand_group(Group<C> const &s1)
 {
-	return Group<typename multiply_comp<C, 10>::type>(s1);
+	Group<typename multiply_comp<C, 10>::type> tmp(s1.get_size());
+	tmp.set_acc_val(s1.get_acc_val());
+	tmp.set_hs_val(s1.get_hs_val());
+	tmp.set_exo_val(s1.get_exo_val());
+	return tmp;
 }	
 
 /*
@@ -433,10 +441,14 @@ multiplicative_expand_group(Group<C> const &s1)
  * do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
-Group<typename additive_rollup_comp<C>::type> const
+	Group<typename additive_rollup_comp<C>::type> const
 additive_rollup_group(Group<C> const &s1) 
 {
-	return Group<typename additive_rollup_comp<C>::type>(s1);
+	Group<typename additive_rollup_comp<C>::type> tmp(s1.get_size());
+	tmp.set_acc_val(s1.get_acc_val());
+	tmp.set_hs_val(s1.get_hs_val());
+	tmp.set_exo_val(s1.get_exo_val());
+	return tmp;
 }	
 
 /*
@@ -444,10 +456,14 @@ additive_rollup_group(Group<C> const &s1)
  * nalezacej do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
-Group<typename split_comp<C, 10>::type> const
+	Group<typename split_comp<C, 10>::type> const
 multiplicative_rollup_group(Group<C> const &s1) 
 {
-	return Group<typename split_comp<C, 10>::type>(s1);
+	Group<typename split_comp<C, 10>::type> tmp(s1.get_size());
+	tmp.set_acc_val(s1.get_acc_val());
+	tmp.set_hs_val(s1.get_hs_val());
+	tmp.set_exo_val(s1.get_exo_val());
+	return tmp;
 }	
 
 /*
@@ -456,7 +472,7 @@ multiplicative_rollup_group(Group<C> const &s1)
  * ktora jest najwieksza w sensie porzadku zdefiniowanego na grupach.
  */
 template<class C1, class C2, class C3>
-bool
+	bool
 solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3)
 {
 	return (g1 > g2 && g1 > g3) || (g2 > g1 && g2 > g3) || (g3 > g1 && g3 > g2);
