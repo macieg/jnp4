@@ -161,9 +161,9 @@ template<class C> class Group {
 		Group(Group<C> const& g)
 		{ 
 			company_number = g.get_size();
-			acc_val = g.get_acc_val;
-			hs_val = g.get_hs_val;
-			exo_val = g.exo_val;
+			acc_val = g.get_acc_val();
+			hs_val = g.get_hs_val();
+			exo_val = g.get_exo_val();
 		}	
 
 		/*
@@ -215,6 +215,14 @@ template<class C> class Group {
 		}
 
 		/*
+		 * Zwraca rozmiar grupy.
+		 */
+		unsigned int get_size() const
+		{
+			return company_number;
+		}
+
+		/*
 		 * Metoda zwracajaca wartosc grupy.
 		 */
 		unsigned int const& get_value() const
@@ -244,8 +252,9 @@ template<class C> class Group {
 		 * Metoda zwracajaca nowa grupe o liczbie firm rownej sumie liczb firm z dwoch grup.
 		 */
 		Group operator+(Group<C> const& g)//ten trick jest moim zdaniem ok
-		{			
-			return *this += g;
+		{
+			Group<C> tmp(*this);	
+			return tmp += g;
 		}
 
 		/*
@@ -260,7 +269,7 @@ template<class C> class Group {
 					(C::acc - g.company.acc)
 					);
 			hs_val = divide(
-					minus(C::hs * acc_val - g.company.hs * g.get_hs_val()),
+					minus(C::hs * hs_val, g.company.hs * g.get_hs_val()),
 					(C::hs - g.company.hs)
 				       );
 			exo_val = divide(
@@ -279,7 +288,8 @@ template<class C> class Group {
 		 */
 		Group operator-(Group<C> const& g)
 		{
-			return *this -= g;
+			Group<C> tmp(*this);
+			return tmp -= g;
 		}
 
 		/*
@@ -302,7 +312,8 @@ template<class C> class Group {
 		 */
 		Group operator*(unsigned int i)
 		{
-			return *this *= i;
+			Group<C> tmp(*this);
+			return tmp *= i;
 		}		
 
 		/*
@@ -325,7 +336,8 @@ template<class C> class Group {
 		 */
 		Group operator/(unsigned int i)
 		{
-			return *this /= i;
+			Group<C> tmp(*this);
+			return tmp /= i;
 		}
 
 		/*
@@ -379,12 +391,11 @@ template<class C> class Group {
 			return (*this == g) || (*this > g);
 		}
 
-		/*
-		 * Metoda wypisujaca na strumien opis grupy.
-		 */
-
 };
 
+/*
+ * Metoda wypisujaca na strumien opis grupy.
+ */
 template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g) //tutaj nie powinno być jeszcze friend? wyrzucilem na zewnątrz, bo w ciele klasy nie chce sie kompilować
 {
 	os << "Number of companies: " << g.get_size() << "; Value: " << g.get_value() <<
@@ -431,7 +442,12 @@ multiplicative_rollup_group(Group<C> const &s1);
  * ktora jest najwieksza w sensie porzadku zdefiniowanego na grupach.
  */
 template<class C1, class C2, class C3>
-bool
-solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3);
+	bool
+solve_auction(Group<C1> const &g1, Group<C2> const &g2, Group<C3> const &g3)
+{
+	return (g1 > g2 && g1 > g3) ||
+		(g2 > g1 && g2 > g3) ||
+		(g3 > g1 && g3 > g2);
+}
 
 #endif
