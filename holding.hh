@@ -1,6 +1,8 @@
 #ifndef HOLDINGHH
 #define HILDINGHH
 
+#include <iostream>
+
 /*
  * Domyslne wartosci przedsiebiorstw.
  */
@@ -228,12 +230,12 @@ template<class C> class Group {
 		 */
 		Group& operator+=(Group<C> const& g) //z tymi operatorami mam troche watpliwosci, do weryfikacji
 		{
-			acc_val = divide((C::acc * acc_val + g.company.acc * g.get_acc_val())
-					, (C::acc + g.company.acc));
-			hs_val = divide((C::hs * acc_val + g.company.hs * g.get_hs_val())
-					, (C::hs + g.company.hs));
-			exo_val = divide((C::exo * exo_val + g.company.exo * g.get_exo_val())
-					, (C::exo + g.company.exo));
+			acc_val = divide((C::acc * acc_val + g.company.acc * g.get_acc_val()),
+					(C::acc + g.company.acc));
+			hs_val = divide((C::hs * acc_val + g.company.hs * g.get_hs_val()),
+					(C::hs + g.company.hs));
+			exo_val = divide((C::exo * exo_val + g.company.exo * g.get_exo_val()),
+					(C::exo + g.company.exo));
 			company_number += g.get_size();
 			return *this;
 		}
@@ -254,16 +256,16 @@ template<class C> class Group {
 		Group& operator-=(Group<C> const& g)
 		{
 			acc_val = divide(
-					minus(C::acc * acc_val, g.company.acc * g.get_acc_val())
-					, (C::acc - g.company.acc)
+					minus(C::acc * acc_val, g.company.acc * g.get_acc_val()),
+					(C::acc - g.company.acc)
 					);
 			hs_val = divide(
-					minus(C::hs * acc_val - g.company.hs * g.get_hs_val())
-					, (C::hs - g.company.hs)
+					minus(C::hs * acc_val - g.company.hs * g.get_hs_val()),
+					(C::hs - g.company.hs)
 				       );
 			exo_val = divide(
-					minus(C::exo * exo_val, g.company.exo * g.get_exo_val())
-					, (C::exo - g.company.exo)
+					minus(C::exo * exo_val, g.company.exo * g.get_exo_val()),
+					(C::exo - g.company.exo)
 					);
 
 			company_number = minus(company_number, g.get_size());
@@ -300,7 +302,7 @@ template<class C> class Group {
 		 */
 		Group operator*(unsigned int i)
 		{
-			return *this *= g;
+			return *this *= i;
 		}		
 
 		/*
@@ -308,7 +310,7 @@ template<class C> class Group {
 		 * Pzy dzieleniu grupy przez n wartosc pojedynczego przedsiebiorstwa
 		 * zwieksza sie n razy. 
 		 */
-		Group& operator /= (unsigned int i)
+		Group& operator/=(unsigned int i)
 		{
 			company_number = divide(company_number, i);
 			acc_val *= i;
@@ -321,51 +323,75 @@ template<class C> class Group {
 		 * Pzy dzieleniu grupy przez n wartosc pojedynczego przedsiebiorstwa
 		 * zwieksza sie n razy. 
 		 */
-		Group operator / (unsigned int i)
+		Group operator/(unsigned int i)
 		{
 			return *this /= i;
 		}
 
 		/*
-		 * Metoda sprawdzajaca rownosc
+		 * Metoda sprawdzajaca rownosc.
 		 */
-		bool operator == (Group<C> const& g);
-
-		/*
-		 * Metoda sprawdzajaca nierownosc
-		 */
-		bool operator != (Group<C> const& g);	
-
-		/*
-		 * Metoda sprawdzajaca wiekszosc
-		 */
-		bool operator > (Group<C> const& g);	
-
-		/*
-		 * Metoda sprawdzajaca mniejszosc 
-		 */
-		bool operator == (Group<C> const& g);		
-
-		/*
-		 * Metoda sprawdzajaca bycie nie wieszym
-		 */
-		bool operator <= (Group<C> const& g);
-
-		/*
-		 * Metoda sprawdzajaca bycie nie mniejszym
-		 */
-		bool operator >= (Group<C> const& g);	
-
-		/*
-		 * Metoda wypisujaca na strumien opis grupy
-		 */
-		ostream& operator << (ostream& os, Group const& g) {
-			os << "Number of companies: " << g.get_size() << "; Value: " << g.get_value() <<
-				"\nAccountancies value: " << g.get_acc_val() << ", Hunting shops value: " << g.get_hs_val() <<
-				", Exchange offices value: " << g.get_exo_val() << endl;
-			return os;
+		template<class D> bool operator==(Group<D> const& g)
+		{
+			return (C::hs * company_number == D::hs * g.get_size()) &&
+				(C::exo * company_number == D::exo * g.get_size());
 		}
+
+		/*
+		 * Metoda sprawdzajaca nierownosc.
+		 */
+		template<class D> bool operator != (Group<D> const& g)
+		{
+			return !(*this == g);
+		}
+
+		/*
+		 * Metoda sprawdzajaca wiekszosc.
+		 */
+		template<class D> bool operator>(Group<D> const& g)
+		{
+			return (C::hs * company_number + C::exo * company_number) >
+				(D::hs * g.get_size() + D::exo * g.get_size());
+		}
+
+		/*
+		 * Metoda sprawdzajaca mniejszosc. 
+		 */
+		template<class D> bool operator<(Group<D> const& g)
+		{
+			return (C::hs * company_number + C::exo * company_number) <
+				(D::hs * g.get_size() + D::exo * g.get_size());
+		}	
+
+		/*
+		 * Metoda sprawdzajaca bycie nie wieszym.
+		 */
+		template<class D> bool operator<=(Group<D> const& g)
+		{
+			return (*this == g) || (*this < g);
+		}
+
+		/*
+		 * Metoda sprawdzajaca bycie nie mniejszym.
+		 */
+		template<class D> bool operator>=(Group<D> const& g)
+		{
+			return (*this == g) || (*this > g);
+		}
+
+		/*
+		 * Metoda wypisujaca na strumien opis grupy.
+		 */
+
 };
+
+template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g) //tutaj nie powinno być jeszcze friend? wyrzucilem na zewnątrz, bo w ciele klasy nie chce sie kompilować
+{
+	os << "Number of companies: " << g.get_size() << "; Value: " << g.get_value() <<
+		"\nAccountancies value: " << g.get_acc_val() << ", Hunting shops value: " << g.get_hs_val() <<
+		", Exchange offices value: " << g.get_exo_val() << std::endl;
+	return os;
+}
 
 /*
  * Zwieksza o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej do grupy s1,
