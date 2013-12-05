@@ -4,13 +4,6 @@
 #include <iostream>
 
 /*
- * Domyslne wartosci przedsiebiorstw.
- */
-#define ACC_DEFAULT 15
-#define HS_DEFAULT 150
-#define EXO_DEFAULT 50
-
-/*
  * Pomocnicze funkcje constexpr z podstawowymi operacjami arytmetycznymi.
  */
 constexpr unsigned int c_minus(unsigned int a, unsigned int b) //nie mam pewnosci co do koniecznosci uzywania tych constexpr, w innym wypadku mamy problemy z kompilacją
@@ -127,12 +120,18 @@ template<class C> struct additive_rollup_comp {
  */
 template<class C> class Group {
 	private:
+		/*
+		 * Domyslne wartosci przedsiebiorstw.
+		 */
+		const int ACC_DEFAULT = 15;
+		const int HS_DEFAULT = 150;
+		const int EXO_DEFAULT = 50;
 
 		unsigned int company_number;
 		unsigned int acc_val;
 		unsigned int hs_val;
 		unsigned int exo_val;
-		
+
 	public:		
 
 		/*
