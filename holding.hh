@@ -1,3 +1,4 @@
+//mk??????, ma333856
 #ifndef HOLDINGHH
 #define HOLDINGHH
 
@@ -345,6 +346,8 @@ template<class C> class Group {
 		 */
 		template<class D> bool operator==(Group<D> const& g) const
 		{
+			if (C::hs == 0 && C::exo == 0 && D::hs == 0 && D::exo == 0)
+				return C::acc * company_number == D::acc * g.get_size();
 			return (C::hs * company_number == D::hs * g.get_size()) &&
 				(C::exo * company_number == D::exo * g.get_size());
 		}
@@ -364,6 +367,8 @@ template<class C> class Group {
 		 */
 		template<class D> bool operator>(Group<D> const& g) const 
 		{
+			if (C::hs == 0 && C::exo == 0 && D::hs == 0 && D::exo == 0)
+				return C::acc * company_number > D::acc * g.get_size();
 			return (C::hs * company_number > D::hs * g.get_size()) && 
 				(C::exo * company_number > D::exo * g.get_size());
 		}
@@ -373,6 +378,8 @@ template<class C> class Group {
 		 */
 		template<class D> bool operator<(Group<D> const& g) const
 		{
+			if (C::hs == 0 && C::exo == 0 && D::hs == 0 && D::exo == 0)
+				return C::acc * company_number < D::acc * g.get_size();
 			return (C::hs * company_number < D::hs * g.get_size()) && 
 				(C::exo * company_number < D::exo * g.get_size());
 		}	
@@ -398,7 +405,7 @@ template<class C> class Group {
 /*
  * Metoda wypisujaca na strumien opis grupy.
  */
-template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g) //tutaj nie powinno być jeszcze friend? wyrzucilem na zewnątrz, bo w ciele klasy nie chce sie kompilować
+template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g) 
 {
 	os << "Number of companies: " << g.get_size() << "; Value: " << g.get_value() <<
 		"\nAccountancies value: " << g.get_acc_val() << ", Hunting shops value: " << g.get_hs_val() <<
