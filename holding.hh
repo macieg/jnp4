@@ -7,7 +7,7 @@
 /*
  * Pomocnicze funkcje constexpr z podstawowymi operacjami arytmetycznymi.
  */
-constexpr unsigned int c_minus(unsigned int a, unsigned int b) //nie mam pewnosci co do koniecznosci uzywania tych constexpr, w innym wypadku mamy problemy z kompilacją
+constexpr unsigned int c_minus(unsigned int a, unsigned int b) 
 {
 	return (a > b) ? (a-b) : 0;
 }
@@ -124,9 +124,9 @@ template<class C> class Group {
 		/*
 		 * Domyslne wartosci przedsiebiorstw.
 		 */
-		const int ACC_DEFAULT = 15;
-		const int HS_DEFAULT = 150;
-		const int EXO_DEFAULT = 50;
+		static const int ACC_DEFAULT = 15;
+		static const int HS_DEFAULT = 150;
+		static const int EXO_DEFAULT = 50;
 
 		unsigned int company_number;
 		unsigned int acc_val;
@@ -237,7 +237,7 @@ template<class C> class Group {
 		 * Wartosc pojedynczego przedsiebiorstwa w nowej grupie liczymy jako srednia 
 		 * wazona wartosci firm z sumowanych grup.
 		 */
-		Group& operator+=(Group<C> const& g) //z tymi operatorami mam troche watpliwosci, do weryfikacji
+		Group& operator+=(Group<C> const& g)
 		{
 			acc_val = divide((C::acc * acc_val * company_number + g.company.acc * g.get_acc_val() * g.get_size()),
 					(C::acc * company_number + g.company.acc * g.get_size()));
@@ -252,7 +252,7 @@ template<class C> class Group {
 		/*
 		 * Metoda zwracajaca nowa grupe o liczbie firm rownej sumie liczb firm z dwoch grup.
 		 */
-		Group operator+(Group<C> const& g)//ten trick jest moim zdaniem ok
+		Group operator+(Group<C> const& g)
 		{
 			Group<C> tmp(*this);	
 			return tmp += g;
@@ -416,8 +416,8 @@ template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g)
 }
 
 /*
- * Zwieksza o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej do grupy s1,
- * nie zmieniajac wartosci pojedynczego przedsiebiorstwa 
+ * Funkcja zwiekszajaca o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej do grupy s1,
+ * nie zmienia wartosci pojedynczego przedsiebiorstwa 
  */
 template<class C>
 	Group<typename additive_expand_comp<C>::type> const
@@ -431,8 +431,8 @@ additive_expand_group(Group<C> const &s1)
 }	
 
 /*
- * Zwieksza dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
- * do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
+ * Funckja zwiekszajaca dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
+ * do grupy s1, nie zmienia wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
 	Group<typename multiply_comp<C, 10>::type> const
@@ -446,8 +446,8 @@ multiplicative_expand_group(Group<C> const &s1)
 }	
 
 /*
- * Zmniejsza o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
- * do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
+ * Funkcja zmniejszajaca o jeden liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy nalezacej 
+ * do grupy s1, nie zmienia wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
 	Group<typename additive_rollup_comp<C>::type> const
@@ -461,8 +461,8 @@ additive_rollup_group(Group<C> const &s1)
 }	
 
 /*
- * Zmniejsza dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy 
- * nalezacej do grupy s1, nie zmieniajac wartosci pojedynczego przedsiebiorstwa.
+ * Funkcja zmniejszajaca dziesieciokrotnie liczbe przedsiebiorstw (wszystkich typow) wchodzacych w sklad kazdej firmy 
+ * nalezacej do grupy s1, nie zmienia wartosci pojedynczego przedsiebiorstwa.
  */
 template<class C>
 	Group<typename split_comp<C, 10>::type> const
