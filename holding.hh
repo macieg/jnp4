@@ -6,9 +6,9 @@
 /*
  * Domyslne wartosci przedsiebiorstw.
  */
-#define ACC_DEFAULT 50
+#define ACC_DEFAULT 15
 #define HS_DEFAULT 150
-#define EXO_DEFAULT 15
+#define EXO_DEFAULT 50
 
 /*
  * Pomocnicze funkcje constexpr z podstawowymi operacjami arytmetycznymi.
@@ -132,6 +132,7 @@ template<class C> class Group {
 		unsigned int acc_val;
 		unsigned int hs_val;
 		unsigned int exo_val;
+		
 	public:		
 
 		/*
@@ -145,7 +146,7 @@ template<class C> class Group {
 		static company_type company;
 
 		/*
-		 * Konstruktor domyslny tworzacy grupe skladajaca sie z n firm.
+		 * Konstruktor domyslny tworzacy grupe skladajaca sie z k firm.
 		 */
 		Group(unsigned int k = 1)
 		{
@@ -238,12 +239,12 @@ template<class C> class Group {
 		 */
 		Group& operator+=(Group<C> const& g) //z tymi operatorami mam troche watpliwosci, do weryfikacji
 		{
-			acc_val = divide((C::acc * acc_val + g.company.acc * g.get_acc_val()),
-					(C::acc + g.company.acc));
-			hs_val = divide((C::hs * acc_val + g.company.hs * g.get_hs_val()),
-					(C::hs + g.company.hs));
-			exo_val = divide((C::exo * exo_val + g.company.exo * g.get_exo_val()),
-					(C::exo + g.company.exo));
+			acc_val = divide((C::acc * acc_val * company_number + g.company.acc * g.get_acc_val() * g.get_size()),
+					(C::acc * company_number + g.company.acc * g.get_size()));
+			hs_val = divide((C::hs * hs_val * company_number + g.company.hs * g.get_hs_val() * g.get_size()),
+					(C::hs * company_number + g.company.hs * g.get_size()));
+			exo_val = divide((C::exo * exo_val * company_number + g.company.exo * g.get_exo_val() * g.get_size()),
+					(C::exo * company_number + g.company.exo * g.get_size()));
 			company_number += g.get_size();
 			return *this;
 		}
@@ -265,21 +266,19 @@ template<class C> class Group {
 		Group& operator-=(Group<C> const& g)
 		{
 			acc_val = divide(
-					minus(C::acc * acc_val, g.company.acc * g.get_acc_val()),
-					(C::acc - g.company.acc)
+					minus(C::acc * acc_val * company_number, g.company.acc * g.get_acc_val() * g.get_size()),
+					minus(C::acc * company_number, g.company.acc * g.get_size())
 					);
 			hs_val = divide(
-					minus(C::hs * hs_val, g.company.hs * g.get_hs_val()),
-					(C::hs - g.company.hs)
+					minus(C::hs * hs_val * company_number, g.company.hs * g.get_hs_val() * g.get_size()),
+					minus(C::hs * company_number, g.company.hs * g.get_size())
 				       );
 			exo_val = divide(
-					minus(C::exo * exo_val, g.company.exo * g.get_exo_val()),
-					(C::exo - g.company.exo)
+					minus(C::exo * exo_val * company_number, g.company.exo * g.get_exo_val() * g.get_size()),
+					minus(C::exo * company_number, g.company.exo * g.get_size())
 					);
 
 			company_number = minus(company_number, g.get_size());
-			company_number = 0;
-
 			return *this;
 		}
 
@@ -402,7 +401,9 @@ template<class C> std::ostream& operator<<(std::ostream& os, const Group<C> & g)
 {
 	os << "Number of companies: " << g.get_size() << "; Value: " << g.get_value() <<
 		"\nAccountancies value: " << g.get_acc_val() << ", Hunting shops value: " << g.get_hs_val() <<
-		", Exchange offices value: " << g.get_exo_val() << std::endl;
+		", Exchange offices value: " << g.get_exo_val() << 
+		"\nAccountancies: " << C::acc << ", Hunting shops: " << C::hs << ", Exchange offices: " << C::exo <<
+		std::endl;
 	return os;
 }
 

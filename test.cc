@@ -19,6 +19,7 @@ int main() {
   assert((s2 + s3).get_size() == 40);
   assert((s2 += s2).get_size() == 40);
   assert(s2.get_size() == 40);
+  assert(s3.get_size() == 20);  
   assert((s2 - s3).get_size() == 20);
   assert((s3 - s2).get_size() == 0);
 
