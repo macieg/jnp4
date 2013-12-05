@@ -1,5 +1,5 @@
 #ifndef HOLDINGHH
-#define HILDINGHH
+#define HOLDINGHH
 
 #include <iostream>
 
