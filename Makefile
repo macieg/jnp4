@@ -1,2 +1,2 @@
 all: holding.hh test.cc
-	g++ -Wall holding.hh -std=c++0x test.cc -o test
+	g++ -Wall holding.hh -std=c++11 test.cc -o test

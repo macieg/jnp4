@@ -359,12 +359,14 @@ template<class C> class Group {
 		}
 
 		/*
-		 * Metoda sprawdzajaca wiekszosc.
+		 * Metoda sprawdzajaca wiekszosc. 
+		 * "Posiadanie większej ilości przedsiębiorstw każdego z tych dwóch 
+		 * typów czyni nas silniejszymi od przeciwnika".
 		 */
-		template<class D> bool operator>(Group<D> const& g) const
+		template<class D> bool operator>(Group<D> const& g) const 
 		{
-			return (C::hs * company_number + C::exo * company_number) >
-				(D::hs * g.get_size() + D::exo * g.get_size());
+			return (C::hs * company_number > D::hs * g.get_size()) && 
+				(C::exo * company_number > D::exo * g.get_size());
 		}
 
 		/*
@@ -372,8 +374,8 @@ template<class C> class Group {
 		 */
 		template<class D> bool operator<(Group<D> const& g) const
 		{
-			return (C::hs * company_number + C::exo * company_number) <
-				(D::hs * g.get_size() + D::exo * g.get_size());
+			return (C::hs * company_number < D::hs * g.get_size()) && 
+				(C::exo * company_number < D::exo * g.get_size());
 		}	
 
 		/*
